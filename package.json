@@ -1,14 +1,14 @@
 {
-  "name": "vishnu-crm",
+  "name": "tholons-crm",
   "version": "1.0.0",
-  "main": "script.js",
+  "description": "Tholons CRM backend + static frontend",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Vishnu",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
