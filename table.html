@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tholons CRM - Partner Clients</title>
+  <style>
+    :root {
+      --primary-blue: #93C5FD;
+      --accent-orange: #FDBA74;
+      --bg-light: #f3f4f6;
+      --text-dark: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 18px; /* bigger base font */
+    }
+
+    /* NAV BAR */
+    .top-bar {
+      width: 100%;
+      padding: 24px 40px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-orange));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 18px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-logo {
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .nav-title {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .nav-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .nav-right {
+      font-size: 17px;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    /* PAGE WRAPPER + FULL-WIDTH CARD */
+    .page-wrapper {
+      flex: 1;
+      padding: 26px 0 34px;
+    }
+
+    .content-card {
+      width: 100%;
+      background: #ffffff;
+      padding: 26px 36px 30px;
+      border-radius: 0;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+      border-top: 6px solid var(--primary-blue);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .header-title-block h2 {
+      margin: 0;
+      font-size: 30px;
+      color: var(--text-dark);
+      font-weight: 800;
+    }
+
+    .partner-label {
+      font-size: 16px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    .top-buttons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* BUTTONS */
+    .btn {
+      border: none;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn-primary {
+      background: var(--accent-orange);
+      color: #111827;
+      box-shadow: 0 4px 10px rgba(251, 186, 116, 0.5);
+    }
+    .btn-primary:hover {
+      background: #f7a955;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(251, 186, 116, 0.65);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    /* FORM SECTION */
+    .form-section {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      padding: 18px 16px 18px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .form-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-dark);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 16px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 16px;
+      color: #374151;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      transition: 0.18s;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.55);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 52px;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 16px;
+      background: #ffffff;
+    }
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 9px 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 700;
+      font-size: 15px;
+      color: #374151;
+    }
+
+    .actions-cell {
+      white-space: nowrap;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: #9ca3af;
+      text-align: center;
+      padding: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        padding: 20px 18px;
+      }
+
+      .content-card {
+        padding: 20px 18px 24px;
+      }
+
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .top-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      table {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<div class="top-bar">
+  <div class="nav-left">
+    <img src="logo.png" alt="Logo" class="nav-logo">
+    <div>
+      <div class="nav-title">Tholons CRM</div>
+      <div class="nav-subtitle">Client Buckets & Engagements</div>
+    </div>
+  </div>
+  <div class="nav-right">Partner View</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrapper">
+  <div class="content-card">
+
+    <div class="header-row">
+      <div class="header-title-block">
+        <h2>Client Table</h2>
+        <div class="partner-label" id="partnerTitle"></div>
+      </div>
+
+      <div class="top-buttons">
+        <button class="btn btn-secondary" onclick="window.location.href='partners.html'">Back</button>
+        <button class="btn btn-primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-title">Add New Client</div>
+      <div class="form-grid">
+        <div>
+          <label for="startDateInput">Start Date</label>
+          <input type="date" id="startDateInput">
+        </div>
+        <div>
+          <label for="clientInput">Client</label>
+          <input type="text" id="clientInput" placeholder="Client name">
+        </div>
+        <div>
+          <label for="spocInput">SPOC</label>
+          <input type="text" id="spocInput" placeholder="Single point of contact">
+        </div>
+        <div>
+          <label for="locationInput">Location</label>
+          <input type="text" id="locationInput" placeholder="City / Country">
+        </div>
+        <div>
+          <label for="rolesInput">Role(s)</label>
+          <input type="text" id="rolesInput" placeholder="Example: Sr Data Engineer">
+        </div>
+        <div>
+          <label for="engagementSelect">Engagement</label>
+          <select id="engagementSelect">
+            <option value="Payroll">Payroll</option>
+            <option value="Permanent Hiring">Permanent Hiring</option>
+            <option value="C2H">C2H</option>
+            <option value="GCC Opportunity">GCC Opportunity</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+        <div id="engagementOtherWrapper" style="display:none;">
+          <label for="engagementOtherInput">If Others, specify</label>
+          <input type="text" id="engagementOtherInput" placeholder="Type engagement type">
+        </div>
+        <div>
+          <label for="currentStatusInput">Current Status</label>
+          <select id="currentStatusInput">
+            <option value="Active">Active</option>
+            <option value="Dormant">Dormant</option>
+          </select>
+        </div>
+        <div>
+          <label for="statusInput">Status</label>
+          <input type="text" id="statusInput" placeholder="Example: In discussion">
+        </div>
+        <div>
+          <label for="nextStepsInput">Next Steps</label>
+          <textarea id="nextStepsInput" placeholder="Example: Schedule call with client"></textarea>
+        </div>
+        <div>
+          <label for="detailsInput">Details (for View Details)</label>
+          <textarea id="detailsInput" placeholder="Additional notes"></textarea>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="addClientBtn">Add Client</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Start Date</th>
+          <th>Client</th>
+          <th>SPOC</th>
+          <th>Location</th>
+          <th>Role(s)</th>
+          <th>Engagement</th>
+          <th>Current Status</th>
+          <th>Status</th>
+          <th>Next Steps</th>
+          <th>Details / Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody id="clientsBody">
+        <!-- Rows injected by JS -->
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

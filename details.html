@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tholons CRM - Client Details</title>
+
+  <style>
+    :root {
+      --primary-blue: #93C5FD;
+      --accent-orange: #FDBA74;
+      --bg-light: #f3f4f6;
+      --text-dark: #111827;
+      --border: #e5e7eb;
+      --gray: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 18px;
+    }
+
+    /* NAV BAR */
+    .top-bar {
+      width: 100%;
+      padding: 24px 40px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-orange));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .nav-logo { height: 52px; object-fit: contain; }
+    .nav-title { font-size: 28px; font-weight: 800; }
+    .nav-subtitle { font-size: 16px; opacity: 0.9; margin-top: 2px; }
+    .nav-right { font-size: 17px; opacity: 0.9; font-weight: 500; }
+
+    /* PAGE + CARD */
+    .page-wrapper {
+      flex: 1;
+      padding: 24px 0 32px;
+    }
+
+    .content-card {
+      width: 100%;
+      background: #ffffff;
+      padding: 26px 36px 30px;
+      border-radius: 0;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+      border-top: 6px solid var(--primary-blue);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 30px;
+      color: var(--text-dark);
+      font-weight: 800;
+    }
+
+    .label-sm {
+      font-size: 16px;
+      color: var(--gray);
+      margin-top: 6px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn-primary {
+      background: var(--accent-orange);
+      color: #111827;
+      box-shadow: 0 2px 8px rgba(251, 186, 116, 0.5);
+    }
+    .btn-primary:hover {
+      background: #f7a955;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-small {
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 7px;
+    }
+
+    /* REQUIREMENTS HEADER */
+    .requirements-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* FORM */
+    .form-section {
+      margin-top: 12px;
+      margin-bottom: 22px;
+      padding: 18px 16px 18px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .form-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-dark);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 16px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 16px;
+      color: #374151;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 52px;
+    }
+
+    /* REQUIREMENT CARDS */
+    .requirements-list {
+      margin-top: 16px;
+    }
+
+    .requirement-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px 18px;
+      margin: 16px 0;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    }
+
+    .requirement-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 8px;
+    }
+
+    .requirement-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .requirement-meta {
+      font-size: 14px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    .requirements-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    /* Info row (JD / Notes / OneDrive) */
+    .requirement-info-row {
+      margin-top: 6px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    a.requirement-link {
+      color: #2563eb;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 15px;
+      background: #ffffff;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 7px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .empty-text {
+      font-size: 15px;
+      color: #9ca3af;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .actions-cell {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        padding: 20px 18px;
+      }
+
+      .content-card {
+        padding: 20px 18px 24px;
+      }
+
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .requirements-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .requirement-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .requirements-actions {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- NAV BAR -->
+<div class="top-bar">
+  <div class="nav-left">
+    <img src="logo.png" alt="Logo" class="nav-logo">
+    <div>
+      <div class="nav-title">Tholons CRM</div>
+      <div class="nav-subtitle">Client Requirements & Candidates</div>
+    </div>
+  </div>
+  <div class="nav-right">Client View</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrapper">
+  <div class="content-card">
+
+    <div class="header-row">
+      <button class="btn btn-secondary" onclick="window.location.href='table.html'">Back</button>
+
+      <div>
+        <h2 id="clientTitle">Client Details</h2>
+        <div class="label-sm" id="clientMeta"></div>
+      </div>
+
+      <div></div>
+    </div>
+
+    <div class="requirements-header">
+      <div class="section-title">Requirements</div>
+      <button class="btn btn-primary" id="addRequirementBtn">Add Requirement</button>
+    </div>
+
+    <!-- REQUIREMENT FORM -->
+    <div id="requirementForm" class="form-section">
+      <div class="form-title" id="requirementFormTitle">New Requirement</div>
+
+      <div class="form-grid">
+        <div>
+          <label for="roleNameInput">Role Name</label>
+          <input type="text" id="roleNameInput">
+        </div>
+        <div>
+          <label for="numReqInput">No of Requirements</label>
+          <input type="number" id="numReqInput">
+        </div>
+        <div>
+          <label for="yearsExpReqInput">Years of Exp</label>
+          <input type="text" id="yearsExpReqInput">
+        </div>
+        <div>
+          <label for="locationReqInput">Location</label>
+          <input type="text" id="locationReqInput">
+        </div>
+        <div>
+          <label for="typePositionInput">Type of Position</label>
+          <input type="text" id="typePositionInput">
+        </div>
+        <div>
+          <label for="contractDurationInput">Contract Duration</label>
+          <input type="text" id="contractDurationInput">
+        </div>
+        <div>
+          <label for="startDateReqInput">Start Date</label>
+          <input type="date" id="startDateReqInput">
+        </div>
+        <div>
+          <label for="numSourcesInput">No of Resume Sent to client</label>
+          <input type="number" id="numSourcesInput">
+        </div>
+        <div>
+          <label for="numShortlistedInput">No of Resumes Selected</label>
+          <input type="number" id="numShortlistedInput">
+        </div>
+        <div>
+          <label for="onedriveLinkInput">OneDrive Link</label>
+          <input type="text" id="onedriveLinkInput">
+        </div>
+        <div>
+          <label for="jobDescFileInput">Upload JD (PDF / DOC)</label>
+          <input type="file" id="jobDescFileInput" accept=".pdf,.doc,.docx">
+        </div>
+        <div>
+          <label for="notesInput">Notes</label>
+          <textarea id="notesInput"></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="saveRequirementBtn">Save Requirement</button>
+    </div>
+
+    <!-- REQUIREMENTS LIST -->
+    <div id="requirementsList" class="requirements-list"></div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

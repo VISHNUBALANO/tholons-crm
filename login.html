@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tholons CRM - Admin Login</title>
+
+    <style>
+        :root {
+            --primary-blue: #93C5FD;
+            --accent-orange: #FDBA74;
+            --bg-light: #f3f4f6;
+            --text-dark: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-light);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAV BAR */
+        .top-bar {
+            width: 100%;
+            padding: 18px 32px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-orange));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .nav-logo {
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .nav-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .nav-right {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        /* LOGIN BOX */
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            padding: 45px 40px 40px;
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.15);
+            border-top: 5px solid var(--primary-blue);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-title {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .login-subtitle {
+            font-size: 15px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .field-label {
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-wrapper {
+            margin-top: 18px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.55);
+        }
+
+        /* BUTTON */
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 28px;
+            background: var(--accent-orange);
+            color: #111827;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 14px rgba(251, 186, 116, 0.5);
+        }
+
+        .login-button:hover {
+            background: #f7a955;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(251, 186, 116, 0.65);
+        }
+
+        .error {
+            color: #b91c1c;
+            font-size: 15px;
+            margin-top: 16px;
+            text-align: center;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 35px 25px 30px;
+            }
+            .login-title {
+                font-size: 24px;
+            }
+            input {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAV WITH LOGO -->
+<div class="top-bar">
+    <div class="nav-left">
+        <img src="logo.png" alt="Logo" class="nav-logo">
+        <div>
+            <div class="nav-title">Tholons CRM</div>
+            <div class="nav-subtitle">Internal Admin Suite</div>
+        </div>
+    </div>
+
+    <div class="nav-right">Secure Login</div>
+</div>
+
+<!-- LOGIN BOX -->
+<div class="page-wrapper">
+    <div class="login-card">
+
+        <div class="login-header">
+            <h1 class="login-title">Admin Login</h1>
+            <div class="login-subtitle">Use your Tholons CRM credentials to continue</div>
+        </div>
+
+        <div class="input-wrapper">
+            <label class="field-label" for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username">
+        </div>
+
+        <div class="input-wrapper">
+            <label class="field-label" for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+        </div>
+
+        <button class="login-button" onclick="checkLogin()">Login</button>
+
+        <div id="error" class="error">Invalid username or password</div>
+    </div>
+</div>
+
+<script>
+function checkLogin() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    const error = document.getElementById("error");
+
+    if (user === "tholonscrm" && pass === "vishnu4561") {
+        error.style.display = "none";
+        window.location.href = "partners.html";
+    } else {
+        error.style.display = "block";
+    }
+}
+</script>
+
+</body>
+</html>

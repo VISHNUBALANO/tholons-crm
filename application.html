@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Application - Tholons CRM</title>
+
+  <style>
+    :root {
+      --primary-blue: #93C5FD;
+      --accent-orange: #FDBA74;
+      --bg-light: #f3f4f6;
+      --text-dark: #111827;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg-light);
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      color: var(--text-dark);
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* NAV BAR */
+    .top-bar {
+      width: 100%;
+      padding: 20px 32px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-orange));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .nav-title {
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .nav-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .nav-right {
+      font-size: 16px;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    /* PAGE WRAPPER FULL WIDTH */
+    .page-wrapper {
+      padding: 24px 16px 40px;
+      width: 100%;
+    }
+
+    /* CONTENT CARD FULL WIDTH */
+    .content-card {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 22px 24px 26px;
+      border-radius: 14px;
+      border-top: 5px solid var(--primary-blue);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent-orange);
+      color: #111827;
+      box-shadow: 0 2px 6px rgba(251, 186, 116, 0.5);
+    }
+
+    .btn-primary:hover {
+      background: #f7a955;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    /* FORM */
+    .form-section {
+      padding: 16px 14px 18px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .form-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px 18px;
+    }
+
+    @media (max-width: 1200px) {
+      .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .field label {
+      font-size: 14px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+      color: #374151;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.55);
+    }
+
+    .actions-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    /* TABLE FULL WIDTH */
+    .table-wrapper {
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1100px;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: white;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tbody tr:hover {
+      background: #e5f2ff;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pill-offer {
+      background: #bbf7d0;
+      color: #166534;
+    }
+
+    .pill-reject {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<div class="top-bar">
+  <div class="nav-left">
+    <img src="logo.png" class="nav-logo" alt="Tholons Logo">
+    <div>
+      <div class="nav-title">Tholons CRM</div>
+      <div class="nav-subtitle">Application Tracking</div>
+    </div>
+  </div>
+  <div class="nav-right">Application Tracker</div>
+</div>
+
+<!-- MAIN -->
+<div class="page-wrapper">
+  <div class="content-card">
+
+    <div class="card-header">
+      <div>
+        <h2>Application Tracker</h2>
+        <div class="card-subtitle">Track candidate progress in one place</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-section">
+      <div class="form-title" id="formTitle">New Candidate</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="appName">Candidate Name</label>
+          <input id="appName">
+        </div>
+
+        <div class="field">
+          <label for="appExp">Years of Experience</label>
+          <input id="appExp">
+        </div>
+
+        <div class="field">
+          <label for="appWorkplace">Workplace Preference</label>
+          <select id="appWorkplace">
+            <option>Native</option>
+            <option>Ready to relocate</option>
+            <option>Ready to commute</option>
+            <option>Not interested</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="appCurrent">Current Salary</label>
+          <input id="appCurrent">
+        </div>
+
+        <div class="field">
+          <label for="appExpected">Expected Salary</label>
+          <input id="appExpected">
+        </div>
+
+        <div class="field">
+          <label for="appDate">Interview Date</label>
+          <input type="date" id="appDate">
+        </div>
+
+        <div class="field">
+          <label for="appTime">Interview Time</label>
+          <input type="time" id="appTime">
+        </div>
+
+        <div class="field">
+          <label for="r1">Round 1</label>
+          <select id="r1">
+            <option>Selected</option>
+            <option>Not selected</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="r2">Round 2</label>
+          <select id="r2">
+            <option>Not necessary</option>
+            <option>Selected</option>
+            <option>Not selected</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="r3">Round 3</label>
+          <select id="r3">
+            <option>Not necessary</option>
+            <option>Selected</option>
+            <option>Not selected</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="r4">Round 4</label>
+          <select id="r4">
+            <option>Not necessary</option>
+            <option>Selected</option>
+            <option>Not selected</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="finalR">Final</label>
+          <select id="finalR">
+            <option>Rejected</option>
+            <option>Offer rolled out</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn btn-primary" id="appSaveBtn">Add Candidate</button>
+        <button class="btn btn-secondary" onclick="history.back()">Back</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+      <table id="appTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Exp</th>
+            <th>Workplace</th>
+            <th>Current</th>
+            <th>Expected</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>R1</th>
+            <th>R2</th>
+            <th>R3</th>
+            <th>R4</th>
+            <th>Final</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
