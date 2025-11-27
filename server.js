@@ -8,37 +8,31 @@ const path = require("path");
 
 const app = express();
 
-// -------------------------
-// ENV + CONFIG
-// -------------------------
-const PORT = process.env.PORT || 3000;
+// -----------------------------------------------------
+// Basic middleware
+// -----------------------------------------------------
+app.use(cors());
+app.use(express.json({ limit: "5mb" }));
+
+// Serve static files (HTML, JS, images) from project root
+app.use(express.static(__dirname));
+
+// -----------------------------------------------------
+// MongoDB connection
+// -----------------------------------------------------
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB = process.env.MONGODB_DB || "TholonsCRM";
+const PORT = process.env.PORT || 3000;
 
 if (!MONGODB_URI) {
-  console.error("❌ MONGODB_URI is not set. Check Render Environment variables.");
+  console.error("MONGODB_URI is not set. Check Render Environment Variables.");
+  process.exit(1);
 }
 
-// -------------------------
-// MIDDLEWARE
-// -------------------------
-app.use(
-  cors({
-    origin: true,
-    credentials: false,
-  })
-);
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files (HTML, JS, logo)
-app.use(express.static(path.join(__dirname)));
-
-// -------------------------
-// MONGOOSE SETUP
-// -------------------------
 mongoose
-  .connect(MONGODB_URI, { dbName: MONGODB_DB })
+  .connect(MONGODB_URI, {
+    dbName: MONGODB_DB,
+  })
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
   })
@@ -46,38 +40,12 @@ mongoose
     console.error("❌ MongoDB connection error:", err);
   });
 
-const Schema = mongoose.Schema;
+// -----------------------------------------------------
+// Mongoose Schemas and Models
+// -----------------------------------------------------
 
-// Partner
-const partnerSchema = new Schema(
-  {
-    name: { type: String, required: true, unique: true, trim: true },
-  },
-  { timestamps: true }
-);
-const Partner = mongoose.model("Partner", partnerSchema);
-
-// Applications embedded schema
-const applicationSchema = new Schema(
-  {
-    name: String,
-    exp: String,
-    work: String,
-    current: String,
-    expected: String,
-    date: String,
-    time: String,
-    r1: String,
-    r2: String,
-    r3: String,
-    r4: String,
-    final: String,
-  },
-  { _id: false }
-);
-
-// Candidate embedded schema
-const candidateSchema = new Schema(
+// Candidates inside a requirement
+const CandidateSchema = new mongoose.Schema(
   {
     candidateName: String,
     position: String,
@@ -93,8 +61,8 @@ const candidateSchema = new Schema(
   { _id: false }
 );
 
-// Requirement embedded schema
-const requirementSchema = new Schema(
+// Requirements inside a client
+const RequirementSchema = new mongoose.Schema(
   {
     roleName: String,
     numRequirements: String,
@@ -109,18 +77,17 @@ const requirementSchema = new Schema(
     notes: String,
     jobDescriptionFileName: String,
     jobDescriptionFileDataUrl: String,
-    candidates: [candidateSchema],
-    applications: [applicationSchema], // track-application per requirement if you want
+    candidates: [CandidateSchema],
   },
   { _id: false }
 );
 
-// Client main schema
-const clientSchema = new Schema(
+// Client document
+const ClientSchema = new mongoose.Schema(
   {
-    partnerName: { type: String, required: true, index: true },
+    partnerName: { type: String, required: true },
     startDate: String,
-    client: String,
+    client: { type: String, required: true },
     spoc: String,
     location: String,
     roles: String,
@@ -130,35 +97,48 @@ const clientSchema = new Schema(
     status: String,
     nextSteps: String,
     details: String,
-    requirements: [requirementSchema],
+    requirements: [RequirementSchema],
   },
   { timestamps: true }
 );
-const Client = mongoose.model("Client", clientSchema);
 
-// -------------------------
-// HEALTH CHECK
-// -------------------------
+// Partner document
+const PartnerSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique: true },
+  },
+  { timestamps: true }
+);
+
+const Partner = mongoose.model("Partner", PartnerSchema);
+const Client = mongoose.model("Client", ClientSchema);
+
+// Seed default partners once
+async function ensureDefaultPartners() {
+  const defaults = ["Addision", "Mondo", "Arc Light"];
+  for (const name of defaults) {
+    await Partner.updateOne({ name }, { name }, { upsert: true });
+  }
+}
+ensureDefaultPartners().catch((e) =>
+  console.error("Error seeding default partners:", e)
+);
+
+// -----------------------------------------------------
+// Routes
+// -----------------------------------------------------
+
+// Health check
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, message: "Tholons CRM backend is running" });
 });
 
-// -------------------------
-// PARTNERS API
-// -------------------------
+// -------------------- PARTNERS -----------------------
 
-// GET all partners
+// Get all partners
 app.get("/api/partners", async (req, res) => {
   try {
     const partners = await Partner.find().sort({ name: 1 }).lean();
-    if (!partners.length) {
-      // seed defaults once
-      const defaults = ["Addision", "Mondo", "Arc Light"];
-      const docs = await Partner.insertMany(
-        defaults.map((n) => ({ name: n }))
-      );
-      return res.json(docs);
-    }
     res.json(partners);
   } catch (err) {
     console.error("Error fetching partners:", err);
@@ -166,21 +146,22 @@ app.get("/api/partners", async (req, res) => {
   }
 });
 
-// POST create partner
+// Create partner
 app.post("/api/partners", async (req, res) => {
   try {
-    const name = (req.body.name || "").trim();
-    if (!name) {
+    const { name } = req.body;
+    if (!name || !name.trim()) {
       return res.status(400).json({ error: "Partner name is required" });
     }
 
-    let existing = await Partner.findOne({ name });
+    const trimmed = name.trim();
+
+    let existing = await Partner.findOne({ name: trimmed });
     if (existing) {
       return res.status(200).json(existing);
     }
 
-    const partner = new Partner({ name });
-    await partner.save();
+    const partner = await Partner.create({ name: trimmed });
     res.status(201).json(partner);
   } catch (err) {
     console.error("Error creating partner:", err);
@@ -188,17 +169,15 @@ app.post("/api/partners", async (req, res) => {
   }
 });
 
-// -------------------------
-// CLIENTS API
-// -------------------------
+// -------------------- CLIENTS ------------------------
 
-// GET all clients for a partner
+// Get all clients for a partner
 app.get("/api/clients/:partnerName", async (req, res) => {
   try {
     const partnerName = req.params.partnerName;
-    const clients = await Client.find({ partnerName })
-      .sort({ createdAt: -1 })
-      .lean();
+    const clients = await Client.find({ partnerName }).sort({
+      createdAt: -1,
+    });
     res.json(clients);
   } catch (err) {
     console.error("Error fetching clients:", err);
@@ -206,43 +185,67 @@ app.get("/api/clients/:partnerName", async (req, res) => {
   }
 });
 
-// POST create client
+// Create a client for a partner
 app.post("/api/clients/:partnerName", async (req, res) => {
   try {
     const partnerName = req.params.partnerName;
 
-    const clientDoc = new Client({
+    const {
+      startDate,
+      client,
+      spoc,
+      location,
+      roles,
+      engagement,
+      engagementOther,
+      currentStatus,
+      status,
+      nextSteps,
+      details,
+      requirements,
+    } = req.body;
+
+    if (!client || !client.trim()) {
+      return res.status(400).json({ error: "Client name is required" });
+    }
+
+    const newClient = await Client.create({
       partnerName,
-      startDate: req.body.startDate || "",
-      client: req.body.client || "",
-      spoc: req.body.spoc || "",
-      location: req.body.location || "",
-      roles: req.body.roles || "",
-      engagement: req.body.engagement || "",
-      engagementOther: req.body.engagementOther || "",
-      currentStatus: req.body.currentStatus || "",
-      status: req.body.status || "",
-      nextSteps: req.body.nextSteps || "",
-      details: req.body.details || "",
-      requirements: [],
+      startDate,
+      client: client.trim(),
+      spoc,
+      location,
+      roles,
+      engagement,
+      engagementOther,
+      currentStatus,
+      status,
+      nextSteps,
+      details,
+      requirements: requirements || [],
     });
 
-    await clientDoc.save();
-    res.status(201).json(clientDoc);
+    res.status(201).json(newClient);
   } catch (err) {
     console.error("Error creating client:", err);
     res.status(500).json({ error: "Failed to create client" });
   }
 });
 
-// PUT update client (used when editing row or requirements)
+// Update a client by id (used when editing, saving requirements etc.)
 app.put("/api/clients/:clientId", async (req, res) => {
   try {
-    const clientId = req.params.clientId;
-    const update = req.body || {};
+    const { clientId } = req.params;
+    const update = req.body;
+
     const updated = await Client.findByIdAndUpdate(clientId, update, {
       new: true,
-    }).lean();
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
     res.json(updated);
   } catch (err) {
     console.error("Error updating client:", err);
@@ -250,11 +253,14 @@ app.put("/api/clients/:clientId", async (req, res) => {
   }
 });
 
-// DELETE client
+// Delete a client by id
 app.delete("/api/clients/:clientId", async (req, res) => {
   try {
-    const clientId = req.params.clientId;
-    await Client.findByIdAndDelete(clientId);
+    const { clientId } = req.params;
+    const deleted = await Client.findByIdAndDelete(clientId);
+    if (!deleted) {
+      return res.status(404).json({ error: "Client not found" });
+    }
     res.json({ ok: true });
   } catch (err) {
     console.error("Error deleting client:", err);
@@ -262,80 +268,42 @@ app.delete("/api/clients/:clientId", async (req, res) => {
   }
 });
 
-// -------------------------
-// APPLICATION TRACKER PER REQUIREMENT
-// -------------------------
+// -----------------------------------------------------
+// Static HTML routes
+// -----------------------------------------------------
 
-// GET applications for a requirement
-app.get(
-  "/api/applications/:partnerName/:clientId/:reqIndex",
-  async (req, res) => {
-    try {
-      const { clientId, reqIndex } = req.params;
-      const client = await Client.findById(clientId).lean();
-      if (!client) return res.status(404).json({ error: "Client not found" });
-
-      const idx = parseInt(reqIndex, 10);
-      if (
-        Number.isNaN(idx) ||
-        !client.requirements ||
-        !client.requirements[idx]
-      ) {
-        return res.status(404).json({ error: "Requirement not found" });
-      }
-
-      const apps = client.requirements[idx].applications || [];
-      res.json(apps);
-    } catch (err) {
-      console.error("Error fetching applications:", err);
-      res.status(500).json({ error: "Failed to fetch applications" });
-    }
-  }
-);
-
-// POST save applications array for a requirement
-app.post(
-  "/api/applications/:partnerName/:clientId/:reqIndex",
-  async (req, res) => {
-    try {
-      const { clientId, reqIndex } = req.params;
-      const apps = Array.isArray(req.body.applications)
-        ? req.body.applications
-        : [];
-
-      const client = await Client.findById(clientId);
-      if (!client) return res.status(404).json({ error: "Client not found" });
-
-      const idx = parseInt(reqIndex, 10);
-      if (
-        Number.isNaN(idx) ||
-        !client.requirements ||
-        !client.requirements[idx]
-      ) {
-        return res.status(404).json({ error: "Requirement not found" });
-      }
-
-      client.requirements[idx].applications = apps;
-      await client.save();
-      res.json({ ok: true });
-    } catch (err) {
-      console.error("Error saving applications:", err);
-      res.status(500).json({ error: "Failed to save applications" });
-    }
-  }
-);
-
-// -------------------------
-// FALLBACK ROUTE FOR HTML
-// IMPORTANT: Express 5 requires '/*' not '*'
-// -------------------------
-app.get("/*", (req, res) => {
+app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "login.html"));
 });
 
-// -------------------------
-// START SERVER
-// -------------------------
+app.get("/login.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+app.get("/partners.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "partners.html"));
+});
+
+app.get("/table.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "table.html"));
+});
+
+app.get("/details.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "details.html"));
+});
+
+app.get("/application.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "application.html"));
+});
+
+// Simple 404 for anything else
+app.use((req, res) => {
+  res.status(404).json({ error: "Not found" });
+});
+
+// -----------------------------------------------------
+// Start server
+// -----------------------------------------------------
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
